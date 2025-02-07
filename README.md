@@ -81,3 +81,14 @@ cargo nextest 是一个 Rust 增强测试工具。
 ```bash
 cargo install cargo-nextest --locked
 ```
+
+### 安装依赖
+
+```bash
+cargo add csv
+cargo add serde --features derive
+cargo add anyhow
+cargo add serde-json
+cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
+
+```

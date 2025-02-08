@@ -1,12 +1,8 @@
-use clap::{command, Parser};
-use std::{fmt, path::Path, str::FromStr};
+use std::{fmt, str::FromStr};
 
-#[derive(Debug, Parser)]
-#[command(name = "rcli", version, about, long_about = None)]
-pub struct Opts {
-    #[command(subcommand)]
-    pub cmd: SubCommand,
-}
+use clap::Parser;
+
+use super::verify_file;
 
 #[derive(Debug, Clone, Copy)]
 pub enum OutputFormat {
@@ -16,34 +12,8 @@ pub enum OutputFormat {
 }
 
 #[derive(Debug, Parser)]
-pub enum SubCommand {
-    #[command(name = "csv", about = "Show csv , or convert csv to other format")]
-    Csv(CsvOpts),
-    #[command(name = "genpass", about = "Generate random password")]
-    Genpass(GenPassOpts),
-}
-
-#[derive(Debug, Parser)]
-pub struct GenPassOpts {
-    #[arg(short, long, default_value_t = 16)]
-    pub length: u8,
-
-    #[arg(long, default_value_t = false)]
-    pub no_symbols: bool,
-
-    #[arg(long, default_value_t = false)]
-    pub no_lowercase: bool,
-
-    #[arg(long, default_value_t = false)]
-    pub no_uppercase: bool,
-
-    #[arg(long, default_value_t = false)]
-    pub no_numbers: bool,
-}
-
-#[derive(Debug, Parser)]
 pub struct CsvOpts {
-    #[arg(short, long, value_parser = verify_input_file)]
+    #[arg(short, long, value_parser = verify_file)]
     pub input: String,
 
     #[arg(short, long)]
@@ -57,13 +27,6 @@ pub struct CsvOpts {
 
     #[arg(long, default_value_t = true)]
     pub header: bool,
-}
-
-fn verify_input_file(filename: &str) -> Result<String, String> {
-    if !Path::new(filename).exists() {
-        return Err(format!("File not found: {}", filename));
-    }
-    Ok(filename.into())
 }
 
 impl From<OutputFormat> for &'static str {

@@ -1,5 +1,8 @@
 use clap::Parser;
-use rcli::{process_csv, process_genpass, Opts, SubCommand};
+use rcli::{
+    get_reader, process_csv, process_decode, process_encode, process_genpass, Base64SubCommand,
+    Opts, SubCommand,
+};
 
 fn main() -> anyhow::Result<()> {
     let opts = Opts::parse();
@@ -23,16 +26,18 @@ fn main() -> anyhow::Result<()> {
             )?;
             println!("Generated password: {}", pwd);
         }
+        SubCommand::Base64(subcommand) => match subcommand {
+            Base64SubCommand::Encode(opts) => {
+                let mut reader = get_reader(&opts.input)?;
+                let encoded = process_encode(&mut reader, opts.format)?;
+                println!("Encoded: {}", encoded);
+            }
+            Base64SubCommand::Decode(opts) => {
+                let mut reader = get_reader(&opts.input)?;
+                let decoded = process_decode(&mut reader, opts.format)?;
+                println!("Decoded: {:?}", decoded);
+            }
+        },
     }
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn test_example() {
-        // 测试代码
-        assert_eq!(2 + 2, 4);
-    }
 }

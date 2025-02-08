@@ -90,5 +90,6 @@ cargo add serde --features derive
 cargo add anyhow
 cargo add serde-json
 cargo install --git https://github.com/XAMPPRocky/tokei.git tokei
-
+cargo add serde_yaml
+cargo add toml
 ```

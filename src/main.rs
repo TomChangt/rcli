@@ -1,7 +1,10 @@
+use std::fs;
+
 use clap::Parser;
 use rcli::{
-    get_reader, process_csv, process_decode, process_encode, process_genpass, Base64SubCommand,
-    Opts, SubCommand,
+    get_reader, process_csv, process_decode, process_encode, process_genpass,
+    process_text_generate, process_text_sign, process_text_verify, Base64SubCommand, Opts,
+    SubCommand, TextSignFormat, TextSubCommand,
 };
 
 fn main() -> anyhow::Result<()> {
@@ -30,12 +33,37 @@ fn main() -> anyhow::Result<()> {
             Base64SubCommand::Encode(opts) => {
                 let mut reader = get_reader(&opts.input)?;
                 let encoded = process_encode(&mut reader, opts.format)?;
-                println!("Encoded: {}", encoded);
+                println!("{}", encoded);
             }
             Base64SubCommand::Decode(opts) => {
                 let mut reader = get_reader(&opts.input)?;
                 let decoded = process_decode(&mut reader, opts.format)?;
-                println!("Decoded: {:?}", decoded);
+                println!("{}", String::from_utf8(decoded)?);
+            }
+        },
+        SubCommand::Text(subcommand) => match subcommand {
+            TextSubCommand::Sign(opts) => {
+                let signed = process_text_sign(&opts.input, &opts.key, opts.format)?;
+                println!("{}", signed);
+            }
+            TextSubCommand::Verify(opts) => {
+                let verified =
+                    process_text_verify(&opts.input, &opts.key, opts.format, &opts.sign)?;
+                println!("{}", verified);
+            }
+            TextSubCommand::Generate(opts) => {
+                let key = process_text_generate(opts.format)?;
+                match opts.format {
+                    TextSignFormat::Blake3 => {
+                        let path = opts.output.join("blake3.key");
+                        fs::write(path, &key[0])?;
+                    }
+                    TextSignFormat::Ed25519 => {
+                        let name = opts.output;
+                        fs::write(name.join("ed25519.sk"), &key[0])?;
+                        fs::write(name.join("ed25519.pk"), &key[1])?;
+                    }
+                }
             }
         },
     }

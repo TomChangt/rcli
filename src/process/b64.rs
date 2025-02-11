@@ -32,3 +32,27 @@ pub fn process_decode(reader: &mut Box<dyn Read>, format: Base64Format) -> anyho
 
     Ok(decoded)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::get_reader;
+
+    #[test]
+    fn test_process_encode() -> anyhow::Result<()> {
+        let input = "Cargo.toml";
+        let mut reader = get_reader(input)?;
+        let format = Base64Format::Standard;
+        assert!(process_encode(&mut reader, format).is_ok());
+        Ok(())
+    }
+
+    #[test]
+    fn test_process_decode() -> anyhow::Result<()> {
+        let input = "fixtures/b64.txt";
+        let mut reader = get_reader(input)?;
+        let format = Base64Format::UrlSafe;
+        assert!(process_decode(&mut reader, format).is_ok());
+        Ok(())
+    }
+}

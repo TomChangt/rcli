@@ -1,4 +1,4 @@
-use rand::seq::{IndexedRandom, SliceRandom};
+use rand::seq::SliceRandom;
 
 const UPPER: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const LOWER: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
@@ -12,7 +12,11 @@ pub fn process_genpass(
     no_numbers: bool,
     no_symbols: bool,
 ) -> anyhow::Result<String> {
-    let mut rng = rand::rng();
+    if no_uppercase && no_lowercase && no_numbers && no_symbols {
+        anyhow::bail!("At least one character type must be selected");
+    }
+
+    let mut rng = rand::thread_rng();
     let mut password = Vec::new();
     let mut chars = Vec::new();
 

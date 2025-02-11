@@ -1,3 +1,13 @@
 {
-  "cSpell.words": ["genpass", "rcli", "serde", "urlsafe"]
+  "cSpell.words": [
+    "csprng",
+    "dalek",
+    "Ed25519Signer",
+    "Ed25519Verifier",
+    "genpass",
+    "rcli",
+    "rngs",
+    "serde",
+    "urlsafe"
+  ]
 }

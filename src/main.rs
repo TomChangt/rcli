@@ -2,12 +2,16 @@ use std::fs;
 
 use clap::Parser;
 use rcli::{
-    get_reader, process_csv, process_decode, process_encode, process_genpass,
-    process_text_generate, process_text_sign, process_text_verify, Base64SubCommand, Opts,
-    SubCommand, TextSignFormat, TextSubCommand,
+    get_reader, process_csv, process_decode, process_encode, process_genpass, process_http_serve,
+    process_text_generate, process_text_sign, process_text_verify, Base64SubCommand,
+    HttpSubCommand, Opts, SubCommand, TextSignFormat, TextSubCommand,
 };
+use tracing::info;
 
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    tracing_subscriber::fmt::init();
+
     let opts = Opts::parse();
 
     match opts.cmd {
@@ -38,7 +42,7 @@ fn main() -> anyhow::Result<()> {
             Base64SubCommand::Decode(opts) => {
                 let mut reader = get_reader(&opts.input)?;
                 let decoded = process_decode(&mut reader, opts.format)?;
-                println!("{}", String::from_utf8(decoded)?);
+                info!("{}", String::from_utf8(decoded)?);
             }
         },
         SubCommand::Text(subcommand) => match subcommand {
@@ -64,6 +68,11 @@ fn main() -> anyhow::Result<()> {
                         fs::write(name.join("ed25519.pk"), &key[1])?;
                     }
                 }
+            }
+        },
+        SubCommand::Http(subcommand) => match subcommand {
+            HttpSubCommand::Serve(opts) => {
+                process_http_serve(opts.dir, opts.port).await?;
             }
         },
     }

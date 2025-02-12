@@ -1,11 +1,12 @@
 mod base64;
 mod csv;
 mod genpass;
+mod http;
 mod text;
 
 use std::path::{Path, PathBuf};
 
-pub use self::{base64::*, csv::*, genpass::*, text::*};
+pub use self::{base64::*, csv::*, genpass::*, http::*, text::*};
 use clap::Parser;
 
 #[derive(Debug, Parser)]
@@ -25,6 +26,8 @@ pub enum SubCommand {
     Base64(Base64SubCommand),
     #[command(subcommand, about = "Text sign or verify")]
     Text(TextSubCommand),
+    #[command(subcommand, about = "Http server")]
+    Http(HttpSubCommand),
 }
 
 fn verify_file(filename: &str) -> Result<String, &'static str> {

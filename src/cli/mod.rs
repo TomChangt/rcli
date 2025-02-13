@@ -8,6 +8,7 @@ use std::path::{Path, PathBuf};
 
 pub use self::{base64::*, csv::*, genpass::*, http::*, text::*};
 use clap::Parser;
+use enum_dispatch::enum_dispatch;
 
 #[derive(Debug, Parser)]
 #[command(name = "rcli", version, about, long_about = None)]
@@ -17,6 +18,7 @@ pub struct Opts {
 }
 
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExecutor)]
 pub enum SubCommand {
     #[command(name = "csv", about = "Show csv , or convert csv to other format")]
     Csv(CsvOpts),

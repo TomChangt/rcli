@@ -8,7 +8,6 @@ use axum::{
     Router,
 };
 use tower_http::services::ServeDir;
-use tracing::{info, warn};
 
 #[derive(Debug)]
 struct HttpServeState {
@@ -38,7 +37,7 @@ async fn file_handler(
     Path(path): Path<String>,
 ) -> (StatusCode, String) {
     let p = std::path::Path::new(&state.path).join(path);
-    info!("File Path: {:?}", p);
+    tracing::info!("File Path: {:?}", p);
     if !p.exists() {
         (
             StatusCode::NOT_FOUND,
@@ -48,7 +47,7 @@ async fn file_handler(
         match tokio::fs::read_to_string(p).await {
             Ok(content) => (StatusCode::OK, content),
             Err(e) => {
-                warn!("Failed to read file: {:?}", e);
+                tracing::warn!("Failed to read file: {:?}", e);
                 (StatusCode::INTERNAL_SERVER_ERROR, e.to_string())
             }
         }
